@@ -1,13 +1,12 @@
-import request from "supertest";
-
 export type PostData = {
     caption: string,
     userId: string,
 };
 
-export const postData = {
-    caption: "hello world!",
-    userId: "56789",
+export type CommentData = {
+    content: string,
+    userId: string,
+    postId: string,
 };
 
 
@@ -23,5 +22,18 @@ export const postsList = [
     {
         caption: "Third post",
         userId: "54321",
+    },
+];
+
+export const commentsList: CommentData[] = [
+    {
+        content: "First post",
+        userId: "12345",
+        postId: "post1",
+    },
+    {
+        content: "Second post",
+        userId: "67890",
+        postId: "post2",
     },
 ];
