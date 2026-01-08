@@ -19,7 +19,7 @@ class BaseController {
             }
         } catch (err) {
             console.error(err);
-            res.status(500).send("Error retrieving movies");
+            res.status(500).send("Error retrieving posts");
         }
     };
 
@@ -28,19 +28,18 @@ class BaseController {
         try {
             const data = await this.model.findById(id);
             if (!data) {
-                return res.status(404).send("Movie not found");
+                return res.status(404).send("Post not found");
             } else {
                 res.json(data);
             }
         } catch (err) {
             console.error(err);
-            res.status(500).send("Error retrieving movie by ID");
+            res.status(500).send("Error retrieving post by ID");
         }
     };
 
     async create(req: Request, res: Response) {
         const postData = req.body;
-        console.log(postData);
         try {
             postData.createDate = new Date();
             const data = await this.model.create(postData);
@@ -59,7 +58,7 @@ class BaseController {
             console.log("delete data -----" + deletedData);
         } catch (err) {
             console.error(err);
-            res.status(500).send("Error deleting movie");
+            res.status(500).send("Error deleting post");
         }
     };
 
@@ -73,7 +72,7 @@ class BaseController {
             res.json(data);
         } catch (err) {
             console.error(err);
-            res.status(500).send("Error updating movie");
+            res.status(500).send("Error updating post");
         }
     };
 };

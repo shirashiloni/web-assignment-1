@@ -10,3 +10,5 @@ const initProject = async () => {
 };
 
 initProject();
+
+export default initProject;
