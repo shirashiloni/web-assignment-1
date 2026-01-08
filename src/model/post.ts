@@ -1,11 +1,6 @@
 import mongoose from "mongoose";
 
 const postSchema = new mongoose.Schema({
-  id:{
-    type: Number,
-    required: true,
-    unique: true,
-  },
   caption: {
     type: String,
     required: true,

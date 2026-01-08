@@ -42,6 +42,7 @@ class BaseController {
         const postData = req.body;
         console.log(postData);
         try {
+            postData.createDate = new Date();
             const data = await this.model.create(postData);
             res.status(201).json(data);
         } catch (err) {

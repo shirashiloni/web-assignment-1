@@ -22,7 +22,7 @@ class PostController extends BaseController {
                 res.status(404).send("Post not found");
                 return;
             }
-            this.model.del(req, res);
+            super.del(req, res);
         } catch (err) {
             console.error(err);
             res.status(500).send("Error deleting post");
@@ -42,7 +42,7 @@ class PostController extends BaseController {
                 res.status(400).send("Cannot change creator of the post");
                 return;
             }
-            this.model.update(req, res);
+            super.update(req, res);
             return;
         }
         catch (err) {
@@ -50,6 +50,17 @@ class PostController extends BaseController {
             res.status(500).send("Error updating post");
         }
     };
+
+    async getBySender(req: Request, res: Response) {
+        const userId = req.params.userId;
+        try {
+            const posts = await this.model.find({ userId });
+            res.json(posts);
+        } catch (err) {
+            console.error(err);
+            res.status(500).send("Error retrieving posts by sender");
+        }
+    }
 }
 
 export default new PostController();
