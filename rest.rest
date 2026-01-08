@@ -1,0 +1,71 @@
+###
+
+GET http://localhost:3000/post
+
+###
+
+GET http://localhost:3000/post?caption=hello
+
+###
+
+GET http://localhost:3000/post/691490ba67c33053554ce8f5
+
+###
+
+GET http://localhost:3000/post/user/1234
+
+### 
+
+POST http://localhost:3000/post 
+Content-Type: application/json
+
+{
+"caption": "my post", "userId": "123"
+}
+
+### 
+
+DELETE http://localhost:3000/post/695ff4d200946327320dde2d
+
+### 
+
+PUT http://localhost:3000/post/695ff4d200946327320dde2d 
+Content-Type: application/json
+
+{
+"caption": "my first post", "userId": "123"
+}
+
+###
+
+GET http://localhost:3000/comment
+
+###
+
+GET http://localhost:3000/comment?year=2000
+
+###
+
+GET http://localhost:3000/comment/691490ba67c33053554ce8f5
+
+### 
+
+POST http://localhost:3000/comment 
+Content-Type: application/json
+
+{
+"content": "my comment", "userId": "123", "postId": "691490ba67c33053554ce8f5"
+}
+
+###
+
+DELETE http://localhost:3000/comment/695ff50700946327320dde35
+
+### 
+
+PUT http://localhost:3000/comment/695ff50700946327320dde35 
+Content-Type: application/json
+
+{
+"content": "my second comment", "userId": "123", "postId": "691490ba67c33053554ce8f5"
+}
