@@ -3,10 +3,22 @@ import request from "supertest";
 import { app } from "../server.js";
 import initDB from "../db.js";
 import postModel from "../model/post.js";
+import userModel from "../model/user.js";
 import { postsList } from "./utils.js"
+
+
+const testUser = {
+  email: "posttester@example.com",
+  password: "password123",
+  userId: "posttester1"
+};
 
 beforeAll(async () => {
   await initDB();
+  await userModel.deleteMany({});
+
+  // Register user for testing ownership if needed, but no token login
+  await request(app).post("/user/register").send(testUser);
 });
 
 beforeEach(async () => {
@@ -17,7 +29,7 @@ afterAll((done) => {
   done();
 });
 
-describe("Sample Test Suite", () => {
+describe("Post Controller Tests", () => {
   test("Sample Test Case", async () => {
     const response = await request(app).get("/post");
     expect(response.status).toBe(200);
@@ -36,7 +48,8 @@ describe("Sample Test Suite", () => {
 
   test("Get All posts", async () => {
     for (const post of postsList) {
-      await request(app).post("/post").send(post);
+      await request(app).post("/post")
+        .send(post);
     }
 
     const response = await request(app).get("/post");
@@ -46,7 +59,8 @@ describe("Sample Test Suite", () => {
 
   test("Get posts by userId", async () => {
     for (const post of postsList) {
-      await request(app).post("/post").send(post);
+      await request(app).post("/post")
+        .send(post);
     }
 
     const response = await request(app).get(
@@ -59,7 +73,8 @@ describe("Sample Test Suite", () => {
   });
 
   test("Get post by ID", async () => {
-    const postCreationResponse = await request(app).post("/post").send(postsList[0]);
+    const postCreationResponse = await request(app).post("/post")
+      .send(postsList[0]);
     const { _id } = postCreationResponse.body;
 
     const response = await request(app).get("/post/" + _id);
@@ -70,7 +85,8 @@ describe("Sample Test Suite", () => {
   });
 
   test("Update post", async () => {
-    const creation = await request(app).post("/post").send(postsList[0]);
+    const creation = await request(app).post("/post")
+      .send(postsList[0]);
     const createdPostId = creation.body._id;
 
     const updatedPostData = {
@@ -88,10 +104,11 @@ describe("Sample Test Suite", () => {
   });
 
   test("Delete post", async () => {
-   const creation = await request(app).post("/post").send(postsList[0]);
+    const creation = await request(app).post("/post")
+      .send(postsList[0]);
     const idToDelete = creation.body._id;
 
-    const response = await request(app).delete("/post/" + idToDelete)
+    const response = await request(app).delete("/post/" + idToDelete);
     expect(response.status).toBe(200);
     expect(response.body._id).toBe(idToDelete);
 
