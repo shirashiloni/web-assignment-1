@@ -5,7 +5,9 @@ import initDB from "../db.js";
 import postModel from "../model/post.js";
 import userModel from "../model/user.js";
 import { postsList } from "./utils.js"
+import mongoose from "mongoose";
 
+let token: string;
 
 const testUser = {
   email: "posttester@example.com",
@@ -14,24 +16,27 @@ const testUser = {
 };
 
 beforeAll(async () => {
-  await initDB();
-  await userModel.deleteMany({});
+    const dbName = `test_db_${process.env.JEST_WORKER_ID || Date.now()}`;
+    await mongoose.connect(`${process.env.MONGO_URI}/${dbName}`);
 
-  // Register user for testing ownership if needed, but no token login
-  await request(app).post("/user/register").send(testUser);
+  // Register and login to get token
+  await request(app).post("/auth/register").send(testUser);
+  const res = await request(app).post("/auth/login").send(testUser);
+  token = res.body.token;
 });
 
 beforeEach(async () => {
   await postModel.deleteMany();
 });
 
-afterAll((done) => {
-  done();
+afterAll(async () => {
+  await postModel.deleteMany({});
+  await mongoose.connection.close();
 });
 
 describe("Post Controller Tests", () => {
   test("Sample Test Case", async () => {
-    const response = await request(app).get("/post");
+    const response = await request(app).get("/post").set("Authorization", "Bearer " + token);
     expect(response.status).toBe(200);
     expect(response.body).toEqual([]);
   });
@@ -39,6 +44,7 @@ describe("Post Controller Tests", () => {
   test("Create post", async () => {
     for (const post of postsList) {
       const response = await request(app).post("/post")
+        .set("Authorization", "Bearer " + token)
         .send(post);
       expect(response.status).toBe(201);
       expect(response.body.caption).toBe(post.caption);
@@ -49,10 +55,11 @@ describe("Post Controller Tests", () => {
   test("Get All posts", async () => {
     for (const post of postsList) {
       await request(app).post("/post")
+        .set("Authorization", "Bearer " + token)
         .send(post);
     }
 
-    const response = await request(app).get("/post");
+    const response = await request(app).get("/post").set("Authorization", "Bearer " + token);
     expect(response.status).toBe(200);
     expect(response.body.length).toBe(postsList.length);
   });
@@ -60,12 +67,13 @@ describe("Post Controller Tests", () => {
   test("Get posts by userId", async () => {
     for (const post of postsList) {
       await request(app).post("/post")
+        .set("Authorization", "Bearer " + token)
         .send(post);
     }
 
     const response = await request(app).get(
       "/post?userId=" + postsList[0]!.userId
-    );
+    ).set("Authorization", "Bearer " + token);
 
     expect(response.status).toBe(200);
     expect(response.body.length).toBe(1);
@@ -74,10 +82,11 @@ describe("Post Controller Tests", () => {
 
   test("Get post by ID", async () => {
     const postCreationResponse = await request(app).post("/post")
+      .set("Authorization", "Bearer " + token)
       .send(postsList[0]);
     const { _id } = postCreationResponse.body;
 
-    const response = await request(app).get("/post/" + _id);
+    const response = await request(app).get("/post/" + _id).set("Authorization", "Bearer " + token);
     expect(response.status).toBe(200);
     expect(response.body.caption).toBe(postsList[0]!.caption);
     expect(response.body.userId).toBe(postsList[0]!.userId);
@@ -86,6 +95,7 @@ describe("Post Controller Tests", () => {
 
   test("Update post", async () => {
     const creation = await request(app).post("/post")
+      .set("Authorization", "Bearer " + token)
       .send(postsList[0]);
     const createdPostId = creation.body._id;
 
@@ -96,6 +106,7 @@ describe("Post Controller Tests", () => {
 
     const response = await request(app)
       .put("/post/" + createdPostId)
+      .set("Authorization", "Bearer " + token)
       .send(updatedPostData);
     expect(response.status).toBe(200);
     expect(response.body.caption).toBe(updatedPostData.caption);
@@ -105,14 +116,15 @@ describe("Post Controller Tests", () => {
 
   test("Delete post", async () => {
     const creation = await request(app).post("/post")
+      .set("Authorization", "Bearer " + token)
       .send(postsList[0]);
     const idToDelete = creation.body._id;
 
-    const response = await request(app).delete("/post/" + idToDelete);
+    const response = await request(app).delete("/post/" + idToDelete).set("Authorization", "Bearer " + token);
     expect(response.status).toBe(200);
     expect(response.body._id).toBe(idToDelete);
 
-    const getResponse = await request(app).get("/post/" + idToDelete);
+    const getResponse = await request(app).get("/post/" + idToDelete).set("Authorization", "Bearer " + token);
     expect(getResponse.status).toBe(404);
   });
 });

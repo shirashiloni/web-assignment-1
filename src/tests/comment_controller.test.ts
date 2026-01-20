@@ -5,7 +5,9 @@ import initDB from "../db.js";
 import commentModel from "../model/comment.js";
 import userModel from "../model/user.js";
 import { commentsList } from "./utils.js"
+import mongoose from "mongoose";
 
+let token: string;
 
 const testUser = {
   email: "commenttester@example.com",
@@ -14,24 +16,28 @@ const testUser = {
 };
 
 beforeAll(async () => {
-  await initDB();
+    const dbName = `test_db_${process.env.JEST_WORKER_ID || Date.now()}`;
+    await mongoose.connect(`${process.env.MONGO_URI}/${dbName}`);
+  
   await userModel.deleteMany({});
 
-  // Register user for testing ownership if needed, but no token login
-  await request(app).post("/user/register").send(testUser);
+  await request(app).post("/auth/register").send(testUser);
+  const res = await request(app).post("/auth/login").send(testUser);
+  token = res.body.token;
 });
 
 beforeEach(async () => {
   await commentModel.deleteMany();
 });
 
-afterAll((done) => {
-  done();
+afterAll(async () => {
+   await commentModel.deleteMany({});
+   await mongoose.connection.close();
 });
 
 describe("Comment Controller Tests", () => {
   test("Sample Test Case", async () => {
-    const response = await request(app).get("/comment");
+    const response = await request(app).get("/comment").set("Authorization", "Bearer " + token);
     expect(response.status).toBe(200);
     expect(response.body).toEqual([]);
   });
@@ -39,6 +45,7 @@ describe("Comment Controller Tests", () => {
   test("Create comment", async () => {
     for (const comment of commentsList) {
       const response = await request(app).post("/comment")
+        .set("Authorization", "Bearer " + token)
         .send(comment);
       expect(response.status).toBe(201);
       expect(response.body.content).toBe(comment.content);
@@ -50,10 +57,11 @@ describe("Comment Controller Tests", () => {
   test("Get All comments", async () => {
     for (const comment of commentsList) {
       await request(app).post("/comment")
+        .set("Authorization", "Bearer " + token)
         .send(comment);
     }
 
-    const response = await request(app).get("/comment");
+    const response = await request(app).get("/comment").set("Authorization", "Bearer " + token);
     expect(response.status).toBe(200);
     expect(response.body.length).toBe(commentsList.length);
   });
@@ -61,12 +69,13 @@ describe("Comment Controller Tests", () => {
   test("Get comments by userId", async () => {
     for (const comment of commentsList) {
       await request(app).post("/comment")
+        .set("Authorization", "Bearer " + token)
         .send(comment);
     }
 
     const response = await request(app).get(
       "/comment?userId=" + commentsList[0]!.userId
-    );
+    ).set("Authorization", "Bearer " + token);
 
     expect(response.status).toBe(200);
     expect(response.body.length).toBe(1);
@@ -76,10 +85,11 @@ describe("Comment Controller Tests", () => {
 
   test("Get comment by ID", async () => {
     const creation = await request(app).post("/comment")
+      .set("Authorization", "Bearer " + token)
       .send(commentsList[0]);
     const { _id } = creation.body;
 
-    const response = await request(app).get("/comment/" + _id);
+    const response = await request(app).get("/comment/" + _id).set("Authorization", "Bearer " + token);
     expect(response.status).toBe(200);
     expect(response.body.content).toBe(commentsList[0]!.content);
     expect(response.body.userId).toBe(commentsList[0]!.userId);
@@ -89,6 +99,7 @@ describe("Comment Controller Tests", () => {
 
   test("Update comment", async () => {
     const creation = await request(app).post("/comment")
+      .set("Authorization", "Bearer " + token)
       .send(commentsList[0]);
     const createdId = creation.body._id;
 
@@ -100,6 +111,7 @@ describe("Comment Controller Tests", () => {
 
     const response = await request(app)
       .put("/comment/" + createdId)
+      .set("Authorization", "Bearer " + token)
       .send(updatedData);
     expect(response.status).toBe(200);
     expect(response.body.content).toBe(updatedData.content);
@@ -111,14 +123,15 @@ describe("Comment Controller Tests", () => {
 
   test("Delete comment", async () => {
     const creation = await request(app).post("/comment")
+      .set("Authorization", "Bearer " + token)
       .send(commentsList[0]);
     const idToDelete = creation.body._id;
 
-    const response = await request(app).delete("/comment/" + idToDelete);
+    const response = await request(app).delete("/comment/" + idToDelete).set("Authorization", "Bearer " + token);
     expect(response.status).toBe(200);
     expect(response.body._id).toBe(idToDelete);
 
-    const getResponse = await request(app).get("/comment/" + idToDelete);
+    const getResponse = await request(app).get("/comment/" + idToDelete).set("Authorization", "Bearer " + token);
     expect(getResponse.status).toBe(404);
   });
 });
