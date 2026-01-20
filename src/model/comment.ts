@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { StringDecoder } from "node:string_decoder";
 
 const postSchema = new mongoose.Schema({
   content: {
@@ -10,7 +11,7 @@ const postSchema = new mongoose.Schema({
     required: true,
   },
   userId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
     ref: 'user',
     required: true,
   },

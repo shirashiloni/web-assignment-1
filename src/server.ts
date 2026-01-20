@@ -5,9 +5,13 @@ import userRouter from './routes/user.js';
 import authRouter from './routes/auth.js';
 import AuthMiddleware from './middlewares/auth_middleware.js';
 
+import { swaggerUiHandler, swaggerUiSetup } from './swagger.js';
+
 export const app = express();
 const port = process.env.PORT || 3000;
 app.use(express.json());
+// Swagger UI endpoint
+app.use('/api-docs', swaggerUiHandler, swaggerUiSetup);
 app.use("/auth", authRouter);
 app.use("/post", AuthMiddleware, postRouter);
 app.use("/comment", AuthMiddleware, commentRouter);

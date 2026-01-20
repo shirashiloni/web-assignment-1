@@ -1,6 +1,126 @@
 import express from "express";
 import PostController from "../controllers/post.js";
 
+/**
+ * @swagger
+ * tags:
+ *   name: Post
+ *   description: Post endpoints
+ */
+
+/**
+ * @swagger
+ * /post/:
+ *   get:
+ *     summary: Get all posts
+ *     tags: [Post]
+ *     responses:
+ *       200:
+ *         description: List of posts
+ *   post:
+ *     summary: Create a new post
+ *     tags: [Post]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+	*           schema:
+	*             type: object
+	*             properties:
+	*               caption:
+	*                 type: string
+	*               createDate:
+	*                 type: string
+	*                 format: date-time
+	*               userId:
+	*                 type: string
+ *     responses:
+ *       201:
+ *         description: Post created
+ *       400:
+ *         description: Invalid input
+ */
+
+/**
+ * @swagger
+ * /post/{id}:
+ *   get:
+ *     summary: Get post by ID
+ *     tags: [Post]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Post found
+ *       404:
+ *         description: Post not found
+ *   delete:
+ *     summary: Delete post by ID
+ *     tags: [Post]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Post deleted
+ *       404:
+ *         description: Post not found
+ *   put:
+ *     summary: Update post by ID
+ *     tags: [Post]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+	*           schema:
+	*             type: object
+	*             properties:
+	*               caption:
+	*                 type: string
+	*               createDate:
+	*                 type: string
+	*                 format: date-time
+	*               userId:
+	*                 type: string
+ *     responses:
+ *       200:
+ *         description: Post updated
+ *       404:
+ *         description: Post not found
+ */
+
+/**
+ * @swagger
+ * /post/user/{userId}:
+ *   get:
+ *     summary: Get posts by user ID
+ *     tags: [Post]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of posts by user
+ *       404:
+ *         description: User not found
+ */
+
 const router = express.Router();
 
 router.get("/", PostController.getAll.bind(PostController));
