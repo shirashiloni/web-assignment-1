@@ -39,7 +39,7 @@ class PostController extends BaseController {
             }
 
             if (req.body.userId && req.body.userId !== post.userId.toString()) {
-                res.status(400).send("Cannot change creator of the post");
+                res.status(403).send("Cannot change creator of the post");
                 return;
             }
             super.update(req, res);

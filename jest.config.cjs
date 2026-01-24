@@ -13,4 +13,5 @@ module.exports = {
   transform: {
     ...defaultPreset.transform,
   },
+  testPathIgnorePatterns: ["/node_modules/", "/dist/"],
 };
