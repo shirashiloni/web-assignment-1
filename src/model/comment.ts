@@ -10,11 +10,13 @@ const postSchema = new mongoose.Schema({
     required: true,
   },
   userId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user',
     required: true,
   },
   postId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'post',
     required: true,
   },
 });

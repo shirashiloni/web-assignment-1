@@ -13,27 +13,27 @@ export type CommentData = {
 export const postsList = [
     {
         caption: "First post",
-        userId: "12345",
+        userId: "000000000000000000012345",
     },
     {
         caption: "Second post",
-        userId: "67890",
+        userId: "000000000000000000067890",
     },
     {
         caption: "Third post",
-        userId: "54321",
+        userId: "000000000000000000054321",
     },
 ];
 
 export const commentsList: CommentData[] = [
     {
         content: "First post",
-        userId: "12345",
-        postId: "post1",
+        userId: "000000000000000000012345",
+        postId: "000000000000000000000001",
     },
     {
         content: "Second post",
-        userId: "67890",
-        postId: "post2",
+        userId: "000000000000000000067890",
+        postId: "000000000000000000000002",
     },
 ];
