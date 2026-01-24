@@ -72,7 +72,7 @@ describe("Post Controller Tests", () => {
     }
 
     const response = await request(app).get(
-      "/post?userId=" + postsList[0]!.userId
+      "/post/user/" + postsList[0]!.userId
     ).set("Authorization", "Bearer " + token);
 
     expect(response.status).toBe(200);
@@ -127,4 +127,50 @@ describe("Post Controller Tests", () => {
     const getResponse = await request(app).get("/post/" + idToDelete).set("Authorization", "Bearer " + token);
     expect(getResponse.status).toBe(404);
   });
+  
+  test("Get post by non-existent ID returns 404", async () => {
+    const nonExistentId = new mongoose.Types.ObjectId();
+    const response = await request(app)
+      .get("/post/" + nonExistentId)
+      .set("Authorization", "Bearer " + token);
+    expect(response.status).toBe(404);
+  });
+  
+    test("Delete post by non-existent ID returns 404", async () => {
+      const nonExistentId = new mongoose.Types.ObjectId();
+      const response = await request(app)
+        .delete("/post/" + nonExistentId)
+        .set("Authorization", "Bearer " + token);
+      expect(response.status).toBe(404);
+    });
+
+    test("Update post by non-existent ID returns 404", async () => {
+      const nonExistentId = new mongoose.Types.ObjectId();
+      const updatedPostData = {
+        caption: "Updated Caption",
+        userId: testUser.userId,
+      };
+      const response = await request(app)
+        .put("/post/" + nonExistentId)
+        .set("Authorization", "Bearer " + token)
+        .send(updatedPostData);
+      expect(response.status).toBe(404);
+    });
+  
+      test("User cannot update a post they did not create", async () => {
+          const creation = await request(app).post("/post")
+            .set("Authorization", "Bearer " + token)
+            .send({...postsList[0], userId: "otherId"});
+          const createdPostId = creation.body._id;
+
+          const updatedPostData = {
+            caption: "Malicious Update",
+            userId: testUser.userId,
+          };
+          const response = await request(app)
+            .put("/post/" + createdPostId)
+            .set("Authorization", "Bearer " + token)
+            .send(updatedPostData);
+          expect(response.status).toBe(403);
+        });
 });

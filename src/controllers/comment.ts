@@ -39,7 +39,7 @@ class CommentController extends BaseController {
             }
 
             if (req.body.userId && req.body.userId !== comment.userId.toString()) {
-                res.status(400).send("Cannot change creator of the comment");
+                res.status(403).send("Cannot change creator of the comment");
                 return;
             }
             super.update(req, res);

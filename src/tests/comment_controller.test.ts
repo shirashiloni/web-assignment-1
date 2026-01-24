@@ -1,7 +1,6 @@
 import "dotenv/config";
 import request from "supertest";
 import { app } from "../server.js";
-import initDB from "../db.js";
 import commentModel from "../model/comment.js";
 import userModel from "../model/user.js";
 import { commentsList } from "./utils.js"
@@ -133,5 +132,45 @@ describe("Comment Controller Tests", () => {
 
     const getResponse = await request(app).get("/comment/" + idToDelete).set("Authorization", "Bearer " + token);
     expect(getResponse.status).toBe(404);
+  });
+
+    test("Delete comment by non-existent ID returns 404", async () => {
+      const nonExistentId = new mongoose.Types.ObjectId();
+      const response = await request(app)
+        .delete("/comment/" + nonExistentId)
+        .set("Authorization", "Bearer " + token);
+      expect(response.status).toBe(404);
+    });
+
+    test("Update comment by non-existent ID returns 404", async () => {
+      const nonExistentId = new mongoose.Types.ObjectId();
+      const updatedData = {
+        content: "Updated content",
+        userId: commentsList[0]!.userId,
+        postId: commentsList[0]!.postId,
+      };
+      const response = await request(app)
+        .put("/comment/" + nonExistentId)
+        .set("Authorization", "Bearer " + token)
+        .send(updatedData);
+      expect(response.status).toBe(404);
+    });
+  
+  test("User cannot update a comment they did not create", async () => {
+    const creation = await request(app).post("/comment")
+      .set("Authorization", "Bearer " + token)
+      .send({...commentsList[0], userId: "otherId"});
+    const createdCommentId = creation.body._id;
+
+    const updatedData = {
+      content: "Malicious Update",
+      userId: testUser.userId,
+      postId: commentsList[0]!.postId,
+    };
+    const response = await request(app)
+      .put("/comment/" + createdCommentId)
+      .set("Authorization", "Bearer " + token)
+      .send(updatedData);
+    expect(response.status).toBe(403);
   });
 });
