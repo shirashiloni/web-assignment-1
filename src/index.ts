@@ -1,8 +1,7 @@
-import dotenv from 'dotenv';
 import initServer from './server.js';
 import connectDB from './db.js';
+import './config.js';
 
-dotenv.config();
 
 if (!process.env.JWT_SECRET || !process.env.JWT_REFRESH_SECRET) {
     console.error("Error: JWT_SECRET or JWT_REFRESH_SECRET must be defined in .env file");

@@ -1,14 +1,38 @@
 import postModel from "../model/post.js";
 import type { Request, Response } from "express";
 import BaseController from "./base.js";
+import { generateTagsForPost } from '../services/ai_keywords.js';
+import { extractKeywordsFromQuery } from '../services/ai_keywords.js';
 
 class PostController extends BaseController {
+    async searchByText(req: Request, res: Response) {
+        const query = req.query.q as string;
+        if (!query) {
+            return res.status(400).json({ error: "Missing search query (q)" });
+        }
+        
+        try {
+            const tags = await extractKeywordsFromQuery(query);
+            const posts = await this.model.find({ tags: { $in: tags } });
+            res.json({ posts, tags });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: "Failed to search posts" });
+        }
+    }
 
     constructor() {
         super(postModel);
     }
 
     async create(req: Request, res: Response) {
+        try {
+            const { caption, ...rest } = req.body;
+            const tags = await generateTagsForPost({ caption, ...rest });
+            req.body.tags = tags;
+        } catch (e) {
+            req.body.tags = [];
+        }
         return super.create(req, res);
     }
 

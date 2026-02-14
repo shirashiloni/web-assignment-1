@@ -38,7 +38,7 @@ describe("Comment Controller Tests", () => {
   test("Sample Test Case", async () => {
     const response = await request(app).get("/comment").set("Authorization", "Bearer " + token);
     expect(response.status).toBe(200);
-    expect(response.body).toEqual([]);
+    expect(response.body.data).toEqual([]);
   });
 
   test("Create comment", async () => {
@@ -62,7 +62,7 @@ describe("Comment Controller Tests", () => {
 
     const response = await request(app).get("/comment").set("Authorization", "Bearer " + token);
     expect(response.status).toBe(200);
-    expect(response.body.length).toBe(commentsList.length);
+    expect(response.body.data.length).toBe(commentsList.length);
   });
 
   test("Get comments by userId", async () => {
@@ -76,10 +76,11 @@ describe("Comment Controller Tests", () => {
       "/comment?userId=" + commentsList[0]!.userId
     ).set("Authorization", "Bearer " + token);
 
+    const data = response.body.data;
     expect(response.status).toBe(200);
-    expect(response.body.length).toBe(1);
-    expect(response.body[0].content).toBe(commentsList[0]!.content);
-    expect(response.body[0].postId).toBe(commentsList[0]!.postId);
+    expect(data.length).toBe(1);
+    expect(data[0].content).toBe(commentsList[0]!.content);
+    expect(data[0].postId).toBe(commentsList[0]!.postId);
   });
 
   test("Get comment by ID", async () => {

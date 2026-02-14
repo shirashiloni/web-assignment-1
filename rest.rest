@@ -8,7 +8,7 @@ GET http://localhost:3000/post?caption=hello
 
 ###
 
-GET http://localhost:3000/post/691490ba67c33053554ce8f5
+GET http://localhost:3000/post/6974a52a9e49711fae395562
 
 ###
 
@@ -20,20 +20,20 @@ POST http://localhost:3000/post
 Content-Type: application/json
 
 {
-"caption": "my post", "userId": "123"
+"caption": "hello world!!", "userId": "123456"
 }
 
 ### 
 
-DELETE http://localhost:3000/post/695ff4d200946327320dde2d
+DELETE http://localhost:3000/post/6974a52a9e49711fae395562
 
 ### 
 
-PUT http://localhost:3000/post/695ff4d200946327320dde2d 
+PUT http://localhost:3000/post/6974a52a9e49711fae395562 
 Content-Type: application/json
 
 {
-"caption": "my first post", "userId": "123"
+"caption": "changes!!", "userId": "123"
 }
 
 ###
@@ -42,11 +42,11 @@ GET http://localhost:3000/comment
 
 ###
 
-GET http://localhost:3000/comment?year=2000
+GET http://localhost:3000/comment?userId=123
 
 ###
 
-GET http://localhost:3000/comment/691490ba67c33053554ce8f5
+GET http://localhost:3000/comment/6974a6009e49711fae39556f
 
 ### 
 
@@ -54,18 +54,18 @@ POST http://localhost:3000/comment
 Content-Type: application/json
 
 {
-"content": "my comment", "userId": "123", "postId": "691490ba67c33053554ce8f5"
+"content": "my second comment", "userId": "123", "postId": "6974a52a9e49711fae395562"
 }
 
 ###
 
-DELETE http://localhost:3000/comment/695ff50700946327320dde35
+DELETE http://localhost:3000/comment/6974a6009e49711fae39556f
 
 ### 
 
-PUT http://localhost:3000/comment/695ff50700946327320dde35 
+PUT http://localhost:3000/comment/6974a6009e49711fae39556f 
 Content-Type: application/json
 
 {
-"content": "my second comment", "userId": "123", "postId": "691490ba67c33053554ce8f5"
+"content": "my updated comment", "userId": "123", "postId": "6974a52a9e49711fae395562"
 }

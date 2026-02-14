@@ -121,9 +121,45 @@ import PostController from "../controllers/post.js";
  *         description: User not found
  */
 
+/**
+ * @swagger
+ * /post/search:
+ *   get:
+ *     summary: Search posts by free text using AI-generated tags
+ *     tags: [Post]
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Free text to search for relevant posts
+ *     responses:
+ *       200:
+ *         description: List of matching posts and extracted tags
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 posts:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Post'
+ *                 tags:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *       400:
+ *         description: Missing search query
+ *       500:
+ *         description: Failed to search posts
+ */
+
 const router = express.Router();
 
 router.get("/", PostController.getAll.bind(PostController));
+router.get("/search", PostController.searchByText.bind(PostController));
 router.get("/:id", PostController.getById.bind(PostController));
 router.post("/", PostController.create.bind(PostController));
 router.delete("/:id", PostController.del.bind(PostController));
