@@ -38,7 +38,7 @@ describe("Post Controller Tests", () => {
   test("Sample Test Case", async () => {
     const response = await request(app).get("/post").set("Authorization", "Bearer " + token);
     expect(response.status).toBe(200);
-    expect(response.body).toEqual([]);
+    expect(response.body.data).toEqual([]);
   });
 
   test("Create post", async () => {
@@ -61,7 +61,7 @@ describe("Post Controller Tests", () => {
 
     const response = await request(app).get("/post").set("Authorization", "Bearer " + token);
     expect(response.status).toBe(200);
-    expect(response.body.length).toBe(postsList.length);
+    expect(response.body.data.length).toBe(postsList.length);
   });
 
   test("Get posts by userId", async () => {

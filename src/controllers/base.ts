@@ -10,18 +10,27 @@ class BaseController {
 
     async getAll(req: Request, res: Response) {
         try {
-            if (req.query) {
-                const filterData = await this.model.find(req.query);
-                return res.json(filterData);
-            } else {
-                const data = await this.model.find();
-                res.json(data);
-            }
+            const { page: _page, limit: _limit, ...filters } = req.query;
+            
+            const page = parseInt(_page as string || '1', 10);
+            const limit = parseInt((_limit as string) || '10', 10);
+            const skip = (page - 1) * limit;
+
+
+            const totalDocs = await this.model.countDocuments(filters);
+            const totalPages = Math.ceil(totalDocs / limit);
+
+            const data = await this.model.find(filters).skip(skip).limit(limit);
+
+            res.json({
+                data,
+                totalPages
+            });
         } catch (err) {
             console.error(err);
             res.status(500).send("Error retrieving posts");
         }
-    };
+    }
 
     async getById(req: Request, res: Response) {
         const id = req.params.id;
