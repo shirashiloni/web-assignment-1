@@ -1,5 +1,6 @@
 import express from "express";
 import UserController from "../controllers/user.js";
+import authMiddleware from "../middlewares/auth_middleware.js";
 
 /**
  * @swagger
@@ -54,8 +55,11 @@ import UserController from "../controllers/user.js";
  *         description: User not found
  */
 
+
 const router = express.Router();
 
+
+router.get("/me", authMiddleware, UserController.getMe);
 router.put("/:id", UserController.updateUser);
 router.delete("/:id", UserController.deleteUser);
 
