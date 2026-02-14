@@ -28,6 +28,7 @@ app.use("/user", AuthMiddleware,   userRouter);
 app.use('/uploads', express.static('public/uploads'));
 app.use("/upload", multerRoute);
 
+
 app.get('/', (req, res) => {
     res.send('Hello World!');
 });

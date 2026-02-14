@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 
+
 const postSchema = new mongoose.Schema({
   caption: {
     type: String,
@@ -13,6 +14,10 @@ const postSchema = new mongoose.Schema({
     type: String,
     ref: 'user',
     required: true,
+  },
+  tags: {
+    type: [String],
+    default: [],
   },
 });
 

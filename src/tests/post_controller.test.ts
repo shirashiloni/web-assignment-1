@@ -1,9 +1,7 @@
 import "dotenv/config";
 import request from "supertest";
 import { app } from "../server.js";
-import initDB from "../db.js";
 import postModel from "../model/post.js";
-import userModel from "../model/user.js";
 import { postsList } from "./utils.js"
 import mongoose from "mongoose";
 
@@ -23,6 +21,14 @@ beforeAll(async () => {
   await request(app).post("/auth/register").send(testUser);
   const res = await request(app).post("/auth/login").send(testUser);
   token = res.body.token;
+
+  jest.spyOn(require("../services/ai_keywords.js"), "extractKeywordsFromQuery").mockResolvedValue([
+      "food", "italian", "cooking", "pasta"
+    ]);
+
+  jest.spyOn(require("../services/ai_keywords.js"), "generateTagsForPost").mockResolvedValue([
+      "fun", "ice creame", "pizza", "pasta"
+    ]);
 });
 
 beforeEach(async () => {
@@ -32,6 +38,7 @@ beforeEach(async () => {
 afterAll(async () => {
   await postModel.deleteMany({});
   await mongoose.connection.close();
+  jest.clearAllMocks();
 });
 
 describe("Post Controller Tests", () => {
@@ -173,4 +180,30 @@ describe("Post Controller Tests", () => {
             .send(updatedPostData);
           expect(response.status).toBe(403);
         });
+
+  test("/post/search returns posts by AI tags", async () => {
+    const posts = [
+      { caption: "Delicious pasta with tomato sauce", userId: testUser.userId, createDate: new Date() },
+      { caption: "Running in the park", userId: testUser.userId, createDate: new Date() },
+      { caption: "Best Italian pizza recipe", userId: testUser.userId, createDate: new Date() },
+    ];
+
+    for (const post of posts) {
+      await request(app)
+        .post("/post")
+        .set("Authorization", "Bearer " + token)
+        .send(post);
+    }
+
+    const response = await request(app)
+      .get("/post/search?q=yummy+pasta")
+      .set("Authorization", "Bearer " + token);
+    expect(response.status).toBe(200);
+    expect(Array.isArray(response.body.posts)).toBe(true);
+
+    const found = response.body.posts.some((p: any) => p.caption.includes("pasta"));
+    expect(found).toBe(true);
+    expect(Array.isArray(response.body.tags)).toBe(true);
+    expect(response.body.tags).toContain("pasta");
+  });
 });
