@@ -60,16 +60,16 @@ const refreshToken = async (req: Request, res: Response) => {
 const register = async (req: Request, res: Response) => {
     const email = req.body.email;
     const password = req.body.password;
-    const userId = req.body.userId;
+    const name = req.body.name;
 
-    if (!email || !password || !userId) {
-        return sendError(400, "Email, password and userId are required", res);
+    if (!email || !password || !name) {
+        return sendError(400, "Email, password and name are required", res);
     }
     
     try {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-        const user = await User.create({ "email": email, "password": hashedPassword, "userId": userId });
+        const user = await User.create({ email, "password": hashedPassword, name });
         const tokens = generateToken(user._id.toString());
         user.refreshTokens.push(tokens.refreshToken);
         await user.save();

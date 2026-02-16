@@ -6,25 +6,31 @@ const sendError = (code: number, message: string, res: Response) => {
     res.status(code).json({ message });
 }
 
+import { AuthRequest } from "../middlewares/auth_middleware";
+
+const getMe = async (req: AuthRequest, res: Response) => {
+    if (!req.user || !req.user._id) {
+        return sendError(401, "Unauthorized", res);
+    }
+    try {
+        const user = await User.findById(req.user._id).select("-password -refreshTokens");
+        if (!user) {
+            return sendError(404, "User not found", res);
+        }
+        res.status(200).json(user);
+    } catch (err) {
+        return sendError(500, "Internal server error", res);
+    }
+};
+
 const updateUser = async (req: Request, res: Response) => {
     const id = req.params.id;
-    const { userId, password } = req.body;
+    const { name, password } = req.body;
 
     try {
         const user = await User.findById(id);
         if (!user) {
             return sendError(404, "User not found", res);
-        }
-
-        if (userId) {
-            // Check uniqueness if changing userId
-            if (userId !== user.userId) {
-                const existingUser = await User.findOne({ userId });
-                if (existingUser) {
-                    return sendError(400, "UserId already taken", res);
-                }
-                user.userId = userId;
-            }
         }
 
         if (password) {
@@ -33,10 +39,14 @@ const updateUser = async (req: Request, res: Response) => {
             user.password = hashedPassword;
         }
 
+        if (name) {
+            user.name = name;
+        }
+
         await user.save();
         res.status(200).json({
             _id: user._id,
-            userId: user.userId,
+            name: user.name,
             email: user.email
         });
     } catch (err) {
@@ -59,5 +69,6 @@ const deleteUser = async (req: Request, res: Response) => {
 
 export default {
     updateUser,
-    deleteUser
+    deleteUser,
+    getMe
 };
