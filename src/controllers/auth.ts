@@ -62,7 +62,7 @@ const register = async (req: Request, res: Response) => {
     const password = req.body.password;
     const userId = req.body.userId;
 
-    if (!email || !password || !userId) {
+    if (!email || !password ) {
         return sendError(400, "Email, password and userId are required", res);
     }
     
