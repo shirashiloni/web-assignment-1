@@ -78,7 +78,7 @@ class PostController extends BaseController {
     async getBySender(req: Request, res: Response) {
         const userId = req.params.userId;
         try {
-            const posts = await this.model.find({ userId });
+            const posts = await this.model.find({ user: userId });
             res.json(posts);
         } catch (err) {
             console.error(err);
