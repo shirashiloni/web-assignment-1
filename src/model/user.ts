@@ -15,6 +15,10 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   refreshTokens: [String],
+  profileImage: {
+    type: String,
+    default: "",
+  },
 });
 
 export default mongoose.model("user", userSchema);  
