@@ -43,16 +43,13 @@ const updateUser = async (req: Request, res: Response) => {
             user.name = name;
         }
 
-        if(profileImage) {
+        if (profileImage) {
             user.profileImage = profileImage
         }
 
         await user.save();
-        res.status(200).json({
-            _id: user._id,
-            name: user.name,
-            email: user.email
-        });
+        const { password: _, ...userResponse } = user.toObject();
+        res.status(200).json(userResponse);
     } catch (err) {
         return sendError(500, "Internal server error", res);
     }
