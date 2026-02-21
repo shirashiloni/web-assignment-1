@@ -68,8 +68,22 @@ const deleteUser = async (req: Request, res: Response) => {
     }
 };
 
+const getUserById = async (req: Request, res: Response) => {
+    const id = req.params.id;
+    try {
+        const user = await User.findById(id).select('-password -refreshTokens');
+        if (!user) {
+            return sendError(404, "User not found", res);
+        }
+        res.status(200).json(user);
+    } catch (err) {
+        return sendError(500, "Internal server error", res);
+    }
+};
+
 export default {
     updateUser,
     deleteUser,
-    getMe
+    getMe,
+    getUserById
 };

@@ -11,6 +11,7 @@ import authMiddleware from "../middlewares/auth_middleware.js";
 
 /**
  * @swagger
+router.get("/:id", UserController.getUserById);
  * /user/{id}:
  *   put:
  *     summary: Update user by ID
@@ -62,5 +63,6 @@ const router = express.Router();
 router.get("/me", authMiddleware, UserController.getMe);
 router.put("/:id", UserController.updateUser);
 router.delete("/:id", UserController.deleteUser);
+router.get("/:id", UserController.getUserById);
 
 export default router;
