@@ -1,4 +1,5 @@
 import postModel from "../model/post.js";
+import likeModel from "../model/like.js";
 import type { Request, Response } from "express";
 import BaseController from "./base.js";
 import { generateTagsForPost } from '../services/ai_keywords.js';
@@ -10,7 +11,7 @@ class PostController extends BaseController {
         if (!query) {
             return res.status(400).json({ error: "Missing search query (q)" });
         }
-        
+
         try {
             const tags = await extractKeywordsFromQuery(query);
             const posts = await this.model.find({ tags: { $in: tags } });
@@ -38,10 +39,10 @@ class PostController extends BaseController {
 
     async del(req: Request, res: Response) {
         const id = req.params.id;
-        
+
         try {
             const post = await this.model.findById(id);
-            
+
             if (!post) {
                 res.status(404).send("Post not found");
                 return;
@@ -53,28 +54,6 @@ class PostController extends BaseController {
         }
     };
 
-    async update(req: Request, res: Response) {
-        const id = req.params.id;
-        try {
-            const post = await this.model.findById(id);
-            if (!post) {
-                res.status(404).send("Post not found");
-                return;
-            }
-
-            if (req.body.userId && req.body.userId !== post.userId.toString()) {
-                res.status(403).send("Cannot change creator of the post");
-                return;
-            }
-            super.update(req, res);
-            return;
-        }
-        catch (err) {
-            console.error(err);
-            res.status(500).send("Error updating post");
-        }
-    };
-
     async getBySender(req: Request, res: Response) {
         const userId = req.params.userId;
         try {
@@ -83,6 +62,54 @@ class PostController extends BaseController {
         } catch (err) {
             console.error(err);
             res.status(500).send("Error retrieving posts by sender");
+        }
+    }
+
+    async likePost(req: Request, res: Response) {
+        const postId = req.params.id;
+        const userId = req.body.userId;
+        if (!userId) {
+            return res.status(400).json({ error: "Missing userId" });
+        }
+        try {
+            const post = await this.model.findById(postId);
+            if (!post) {
+                return res.status(404).json({ error: "Post not found" });
+            }
+
+            const existingLike = await likeModel.findOne({ postId, userId });
+            if (!existingLike) {
+                await likeModel.create({ postId, userId });
+                post.likeCount = (post.likeCount || 0) + 1;
+                await post.save();
+            }
+            res.json({ likeCount: post.likeCount });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: "Failed to like post" });
+        }
+    }
+
+    async unlikePost(req: Request, res: Response) {
+        const postId = req.params.id;
+        const userId = req.body.userId;
+        if (!userId) {
+            return res.status(400).json({ error: "Missing userId" });
+        }
+        try {
+            const post = await this.model.findById(postId);
+            if (!post) {
+                return res.status(404).json({ error: "Post not found" });
+            }
+            const like = await likeModel.findOneAndDelete({ postId, userId });
+            if (like && post.likeCount > 0) {
+                post.likeCount = post.likeCount - 1;
+                await post.save();
+            }
+            res.json({ likeCount: post.likeCount });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: "Failed to unlike post" });
         }
     }
 }

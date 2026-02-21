@@ -23,6 +23,10 @@ const postSchema = new mongoose.Schema({
     type: [String],
     default: [],
   },
+    likeCount: {
+      type: Number,
+      default: 0,
+    },
 });
 
 export default mongoose.model("post", postSchema);
