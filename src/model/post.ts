@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 const postSchema = new mongoose.Schema({
   imageUrl: {
     type: String,
-    required: true,
+    required: false,
   },
   caption: {
     type: String,
@@ -22,6 +22,14 @@ const postSchema = new mongoose.Schema({
   tags: {
     type: [String],
     default: [],
+  },
+  likeCount: {
+    type: Number,
+    default: 0,
+  },
+  commentsCount: {
+    type: Number,
+    default: 0,
   },
 });
 

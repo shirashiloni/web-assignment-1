@@ -25,7 +25,7 @@ const getMe = async (req: AuthRequest, res: Response) => {
 
 const updateUser = async (req: Request, res: Response) => {
     const id = req.params.id;
-    const { name, password, profileImage } = req.body;
+    const { name, password, profileImage, userId } = req.body;
 
     try {
         const user = await User.findById(id);
@@ -43,16 +43,17 @@ const updateUser = async (req: Request, res: Response) => {
             user.name = name;
         }
 
-        if(profileImage) {
-            user.profileImage = profileImage
+        if (profileImage) {
+            user.profileImage = profileImage;
+        }
+
+        if (userId) {
+            user.userId = userId;
         }
 
         await user.save();
-        res.status(200).json({
-            _id: user._id,
-            name: user.name,
-            email: user.email
-        });
+        const { password: _, ...userResponse } = user.toObject();
+        res.status(200).json(userResponse);
     } catch (err) {
         return sendError(500, "Internal server error", res);
     }
@@ -71,8 +72,22 @@ const deleteUser = async (req: Request, res: Response) => {
     }
 };
 
+const getUserById = async (req: Request, res: Response) => {
+    const id = req.params.id;
+    try {
+        const user = await User.findById(id).select('-password -refreshTokens');
+        if (!user) {
+            return sendError(404, "User not found", res);
+        }
+        res.status(200).json(user);
+    } catch (err) {
+        return sendError(500, "Internal server error", res);
+    }
+};
+
 export default {
     updateUser,
     deleteUser,
-    getMe
+    getMe,
+    getUserById
 };

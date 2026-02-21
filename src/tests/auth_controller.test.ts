@@ -7,7 +7,8 @@ import User from "../model/user";
 const testUser = {
     email: "test@example.com",
     password: "password123",
-    userId: "testuser1"
+    userId: "testuser1",
+    name: "Test User",
 };
 
 beforeAll(async () => {

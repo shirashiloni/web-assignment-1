@@ -11,13 +11,14 @@ let token: string;
 const testUser = {
   email: "commenttester@example.com",
   password: "password123",
-  userId: "commenttester1"
+  userId: "commenttester1",
+  name: "Test User",
 };
 
 beforeAll(async () => {
-    const dbName = `test_db_${process.env.JEST_WORKER_ID || Date.now()}`;
-    await mongoose.connect(`${process.env.MONGO_URI}/${dbName}`);
-  
+  const dbName = `test_db_${process.env.JEST_WORKER_ID || Date.now()}`;
+  await mongoose.connect(`${process.env.MONGO_URI}/${dbName}`);
+
   await userModel.deleteMany({});
 
   await request(app).post("/auth/register").send(testUser);
@@ -30,8 +31,8 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
-   await commentModel.deleteMany({});
-   await mongoose.connection.close();
+  await commentModel.deleteMany({});
+  await mongoose.connection.close();
 });
 
 describe("Comment Controller Tests", () => {
@@ -135,32 +136,32 @@ describe("Comment Controller Tests", () => {
     expect(getResponse.status).toBe(404);
   });
 
-    test("Delete comment by non-existent ID returns 404", async () => {
-      const nonExistentId = new mongoose.Types.ObjectId();
-      const response = await request(app)
-        .delete("/comment/" + nonExistentId)
-        .set("Authorization", "Bearer " + token);
-      expect(response.status).toBe(404);
-    });
+  test("Delete comment by non-existent ID returns 404", async () => {
+    const nonExistentId = new mongoose.Types.ObjectId();
+    const response = await request(app)
+      .delete("/comment/" + nonExistentId)
+      .set("Authorization", "Bearer " + token);
+    expect(response.status).toBe(404);
+  });
 
-    test("Update comment by non-existent ID returns 404", async () => {
-      const nonExistentId = new mongoose.Types.ObjectId();
-      const updatedData = {
-        content: "Updated content",
-        userId: commentsList[0]!.userId,
-        postId: commentsList[0]!.postId,
-      };
-      const response = await request(app)
-        .put("/comment/" + nonExistentId)
-        .set("Authorization", "Bearer " + token)
-        .send(updatedData);
-      expect(response.status).toBe(404);
-    });
-  
+  test("Update comment by non-existent ID returns 404", async () => {
+    const nonExistentId = new mongoose.Types.ObjectId();
+    const updatedData = {
+      content: "Updated content",
+      userId: commentsList[0]!.userId,
+      postId: commentsList[0]!.postId,
+    };
+    const response = await request(app)
+      .put("/comment/" + nonExistentId)
+      .set("Authorization", "Bearer " + token)
+      .send(updatedData);
+    expect(response.status).toBe(404);
+  });
+
   test("User cannot update a comment they did not create", async () => {
     const creation = await request(app).post("/comment")
       .set("Authorization", "Bearer " + token)
-      .send({...commentsList[0], userId: "otherId"});
+      .send({ ...commentsList[0], userId: "otherId" });
     const createdCommentId = creation.body._id;
 
     const updatedData = {

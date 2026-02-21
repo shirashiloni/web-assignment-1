@@ -9,6 +9,7 @@ import authMiddleware from "../middlewares/auth_middleware.js";
  *   description: User endpoints
  */
 
+
 /**
  * @swagger
  * /user/{id}:
@@ -25,15 +26,15 @@ import authMiddleware from "../middlewares/auth_middleware.js";
  *       required: true
  *       content:
  *         application/json:
-	*           schema:
-	*             type: object
-	*             properties:
-	*               userId:
-	*                 type: string
-	*               email:
-	*                 type: string
-	*               password:
-	*                 type: string
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
  *     responses:
  *       200:
  *         description: User updated
@@ -62,5 +63,6 @@ const router = express.Router();
 router.get("/me", authMiddleware, UserController.getMe);
 router.put("/:id", UserController.updateUser);
 router.delete("/:id", UserController.deleteUser);
+router.get("/:id", UserController.getUserById);
 
 export default router;

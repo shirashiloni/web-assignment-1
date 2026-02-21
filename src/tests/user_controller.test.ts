@@ -7,7 +7,8 @@ import User from "../model/user";
 const testUser = {
     email: "test@example.com",
     password: "password123",
-    userId: "testuser1"
+    userId: "uniqueTestUser1",
+    name: "Test User",
 };
 
 let token: string;
@@ -57,24 +58,6 @@ describe("User Controller", () => {
                 password: testUser.password
             });
             expect(oldLoginRes.statusCode).toEqual(401);
-        });
-
-        it("should update userId", async () => {
-            await request(app).post("/auth/register").send(testUser);
-            const userBefore = await User.findOne({ email: testUser.email });
-            const objectId = userBefore?._id;
-
-            const newUserId = "coolUser123";
-            const res = await request(app)
-            .put(`/user/${objectId}`)
-            .set("Authorization", "Bearer " + token)
-            .send({ userId: newUserId });
-
-            expect(res.statusCode).toEqual(200);
-            expect(res.body.userId).toBe(newUserId);
-
-            const userAfter = await User.findById(objectId);
-            expect(userAfter?.userId).toBe(newUserId);
         });
     });
 

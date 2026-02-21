@@ -61,15 +61,16 @@ const register = async (req: Request, res: Response) => {
     const email = req.body.email;
     const password = req.body.password;
     const name = req.body.name;
+    const userId = req.body.userId;
 
-    if (!email || !password || !name) {
-        return sendError(400, "Email, password and name are required", res);
+    if (!email || !password || !name || !userId) {
+        return sendError(400, "Email, userId, password and name are required", res);
     }
-    
+
     try {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-        const user = await User.create({ email, "password": hashedPassword, name });
+        const user = await User.create({ email, password: hashedPassword, name, userId });
         const tokens = generateToken(user._id.toString());
         user.refreshTokens.push(tokens.refreshToken);
         await user.save();

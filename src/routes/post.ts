@@ -165,5 +165,7 @@ router.post("/", PostController.create.bind(PostController));
 router.delete("/:id", PostController.del.bind(PostController));
 router.put("/:id", PostController.update.bind(PostController));
 router.get("/user/:userId", PostController.getBySender.bind(PostController));
+router.post("/:id/like", PostController.likePost.bind(PostController));
+router.post("/:id/unlike", PostController.unlikePost.bind(PostController));
 
 export default router;

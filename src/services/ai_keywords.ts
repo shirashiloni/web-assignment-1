@@ -6,7 +6,7 @@ const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 export async function generateTagsForPost(postData: { caption: string, [key: string]: any }): Promise<string[]> { 
   const prompt = `
-    Analyze the following post data and extract 3-20 relevant keywords or tags for searching.
+    Analyze the following post data and extract 10-20 relevant keywords or tags for searching.
     Post Data: ${JSON.stringify(postData)}
     
     Output Requirement: Return ONLY a raw JSON array of strings. Do not include markdown formatting (like \`\`\`json) or explanations.
