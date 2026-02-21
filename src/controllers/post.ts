@@ -14,8 +14,8 @@ class PostController extends BaseController {
 
         try {
             const tags = await extractKeywordsFromQuery(query);
-            const posts = await this.model.find({ tags: { $in: tags } });
-            res.json({ posts, tags });
+            const posts = await this.model.find({ tags: { $in: [...tags, query] } });
+            res.json({ data: posts, tags });
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: "Failed to search posts" });
