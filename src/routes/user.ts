@@ -9,9 +9,9 @@ import authMiddleware from "../middlewares/auth_middleware.js";
  *   description: User endpoints
  */
 
+
 /**
  * @swagger
-router.get("/:id", UserController.getUserById);
  * /user/{id}:
  *   put:
  *     summary: Update user by ID
@@ -26,15 +26,15 @@ router.get("/:id", UserController.getUserById);
  *       required: true
  *       content:
  *         application/json:
-	*           schema:
-	*             type: object
-	*             properties:
-	*               userId:
-	*                 type: string
-	*               email:
-	*                 type: string
-	*               password:
-	*                 type: string
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
  *     responses:
  *       200:
  *         description: User updated

@@ -14,14 +14,17 @@ export const postsList = [
     {
         caption: "First post",
         userId: "000000000000000000012345",
+        imageUrl: "https://example.com/image1.jpg",
     },
     {
         caption: "Second post",
         userId: "000000000000000000067890",
+        imageUrl: "https://example.com/image2.jpg",
     },
     {
         caption: "Third post",
         userId: "000000000000000000054321",
+        imageUrl: "https://example.com/image3.jpg",
     },
 ];
 

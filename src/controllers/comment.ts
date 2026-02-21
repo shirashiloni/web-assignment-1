@@ -1,5 +1,4 @@
 import commentModel from "../model/comment.js";
-import postModel from "../model/post.js";
 import type { Request, Response } from "express";
 import BaseController from "./base.js";
 
@@ -10,27 +9,20 @@ class CommentController extends BaseController {
     }
 
     async create(req: Request, res: Response) {
-        const { postId } = req.body;
-        const result = await super.create(req, res);
-        if (postId) {
-            await postModel.findByIdAndUpdate(postId, { $inc: { commentsCount: 1 } });
-        }
-        return result;
+        return super.create(req, res);
     }
 
     async del(req: Request, res: Response) {
         const id = req.params.id;
+        
         try {
             const comment = await this.model.findById(id);
+            
             if (!comment) {
                 res.status(404).send("Comment not found");
                 return;
             }
-            const postId = comment.postId;
-            await super.del(req, res);
-            if (postId) {
-                await postModel.findByIdAndUpdate(postId, { $inc: { commentsCount: -1 } });
-            }
+            super.del(req, res);
         } catch (err) {
             console.error(err);
             res.status(500).send("Error deleting comment");

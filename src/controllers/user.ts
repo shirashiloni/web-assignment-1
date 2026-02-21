@@ -25,7 +25,7 @@ const getMe = async (req: AuthRequest, res: Response) => {
 
 const updateUser = async (req: Request, res: Response) => {
     const id = req.params.id;
-    const { name, password, profileImage } = req.body;
+    const { name, password, profileImage, userId } = req.body;
 
     try {
         const user = await User.findById(id);
@@ -44,7 +44,11 @@ const updateUser = async (req: Request, res: Response) => {
         }
 
         if (profileImage) {
-            user.profileImage = profileImage
+            user.profileImage = profileImage;
+        }
+
+        if (userId) {
+            user.userId = userId;
         }
 
         await user.save();

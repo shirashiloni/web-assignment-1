@@ -63,6 +63,10 @@ class BaseController {
         const id = req.params.id;
         try {
             const deletedData = await this.model.findByIdAndDelete(id);
+            if (!deletedData) {
+                 res.status(404).send("Post not found");
+                 return;
+            }
             res.status(200).json(deletedData);
             console.log("delete data -----" + deletedData);
         } catch (err) {
@@ -78,6 +82,11 @@ class BaseController {
             const data = await this.model.findByIdAndUpdate(id, updatedData, {
                 new: true,
             });
+
+            if (!data) {
+                res.status(404).send("Post not found");
+                return;
+            }
             res.json(data);
         } catch (err) {
             console.error(err);
