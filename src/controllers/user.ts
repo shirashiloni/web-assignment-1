@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
-import User from "../model/user";
+import User from "../model/user.js";
 
 const sendError = (code: number, message: string, res: Response) => {
     res.status(code).json({ message });
 }
 
-import { AuthRequest } from "../middlewares/auth_middleware";
+import { AuthRequest } from "../middlewares/auth_middleware.js";
 
 const getMe = async (req: AuthRequest, res: Response) => {
     if (!req.user || !req.user._id) {

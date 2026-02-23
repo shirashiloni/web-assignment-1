@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
-import User from "../model/user";
+import User from "../model/user.js";
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import { OAuth2Client } from 'google-auth-library';
