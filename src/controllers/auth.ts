@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import User from "../model/user";
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
+import { OAuth2Client } from 'google-auth-library';
 
 const sendError = (code: number, message: string, res: Response) => {
     res.status(code).json({ message });
@@ -16,10 +17,10 @@ type GeneratedTokens = {
 const generateToken = (userId: string): GeneratedTokens => {
     const secret = process.env.JWT_SECRET!;
     const expiresIn = parseInt(process.env.JWT_EXPIRES_IN || "3600");
-    const token = jwt.sign({ _id: userId }, secret,{ expiresIn: expiresIn });
+    const token = jwt.sign({ _id: userId }, secret, { expiresIn: expiresIn });
 
     const refreshExpiresIn = parseInt(process.env.REFRESH_TOKEN_EXPIRES_IN || "86400");
-    const refreshToken = jwt.sign( { _id: userId },  secret, { expiresIn: refreshExpiresIn });
+    const refreshToken = jwt.sign({ _id: userId }, secret, { expiresIn: refreshExpiresIn });
 
     return { token, refreshToken };
 }
@@ -107,8 +108,45 @@ const login = async (req: Request, res: Response) => {
     }
 }
 
+const CLIENT_ID = '377932721805-eqjcgh79s8ihem5c53cqls924k25i836.apps.googleusercontent.com';
+const client = new OAuth2Client(CLIENT_ID);
+
+const loginWithGoogle = async (req: Request, res: Response) => {
+    const { credential } = req.body;
+
+    try {
+        const ticket = await client.verifyIdToken({
+            idToken: credential,
+            audience: CLIENT_ID,
+        });
+
+        const payload = ticket.getPayload();
+        if (payload) {
+            let user = await User.findOne({ email: payload.email });
+            if (user == null) {
+                user = await User.create({
+                    email: payload.email,
+                    name: payload?.name || 'Google User',
+                    userId: payload.sub,
+                    password: '0',
+                    profileImage: payload?.picture
+                });
+            }
+            const tokens = generateToken(user._id.toString());
+            user.refreshTokens.push(tokens.refreshToken);
+            await user.save();
+
+            res.json({ refreshToken: tokens.refreshToken });
+        }
+    } catch (error) {
+        console.error("Token verification failed:", error);
+        res.status(401).json({ error: "Invalid Google token" });
+    }
+}
+
 export default {
     register,
     login,
     refreshToken,
+    loginWithGoogle
 };
