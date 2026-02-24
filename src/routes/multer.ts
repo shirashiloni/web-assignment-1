@@ -29,4 +29,4 @@ router.post('/', upload.single("file"), function (req: any, res: any) {
     res.status(200).send({ url: url })
 });
 
-export = router;
+export default router;
