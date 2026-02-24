@@ -98,5 +98,60 @@ describe("Auth Controller", () => {
 
             expect(res.statusCode).toEqual(401);
         });
+
+        it("should fail when refresh token body is missing", async () => {
+            const res = await request(app)
+                .post("/auth/refresh")
+                .send({});
+            expect(res.statusCode).toEqual(400);
+        });
+    });
+
+    describe("POST /auth/login - failures", () => {
+        it("should fail with wrong password", async () => {
+            await request(app).post("/auth/register").send(testUser);
+            const res = await request(app)
+                .post("/auth/login")
+                .send({ email: testUser.email, password: "wrongpassword" });
+            expect(res.statusCode).toEqual(401);
+        });
+
+        it("should fail when user does not exist", async () => {
+            const res = await request(app)
+                .post("/auth/login")
+                .send({ email: "nonexistent@example.com", password: "password" });
+            expect(res.statusCode).toEqual(401);
+        });
+
+        it("should fail with missing email", async () => {
+            const res = await request(app)
+                .post("/auth/login")
+                .send({ password: "password123" });
+            expect(res.statusCode).toEqual(400);
+        });
+    });
+
+    describe("POST /auth/register - failures", () => {
+        it("should fail with duplicate email", async () => {
+            await request(app).post("/auth/register").send(testUser);
+            const res = await request(app)
+                .post("/auth/register")
+                .send(testUser);
+            expect(res.statusCode).toEqual(500);
+        });
+
+        it("should fail with missing name", async () => {
+            const res = await request(app)
+                .post("/auth/register")
+                .send({ email: "new@example.com", password: "pass123", userId: "newuser1" });
+            expect(res.statusCode).toEqual(400);
+        });
+
+        it("should fail with missing userId", async () => {
+            const res = await request(app)
+                .post("/auth/register")
+                .send({ email: "new2@example.com", password: "pass123", name: "Test" });
+            expect(res.statusCode).toEqual(400);
+        });
     });
 });
