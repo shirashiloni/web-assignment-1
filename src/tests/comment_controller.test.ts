@@ -175,4 +175,29 @@ describe("Comment Controller Tests", () => {
       .send(updatedData);
     expect(response.status).toBe(403);
   });
+
+  test("Get comment by non-existent ID returns 404", async () => {
+    const nonExistentId = new mongoose.Types.ObjectId();
+    const response = await request(app)
+      .get("/comment/" + nonExistentId)
+      .set("Authorization", "Bearer " + token);
+    expect(response.status).toBe(404);
+  });
+
+  test("Get comments filtered by postId", async () => {
+    for (const comment of commentsList) {
+      await request(app).post("/comment")
+        .set("Authorization", "Bearer " + token)
+        .send(comment);
+    }
+
+    const response = await request(app)
+      .get("/comment?postId=" + commentsList[0]!.postId)
+      .set("Authorization", "Bearer " + token);
+
+    expect(response.status).toBe(200);
+    const data = response.body.data;
+    expect(data.length).toBeGreaterThan(0);
+    data.forEach((c: any) => expect(c.postId).toBe(commentsList[0]!.postId));
+  });
 });

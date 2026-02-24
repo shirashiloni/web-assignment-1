@@ -4,6 +4,8 @@
     "moduleResolution": "NodeNext",
     "target": "ES2022",
     "outDir": "./dist",
+    "esModuleInterop": true,
+    "isolatedModules": true
   },
   "exclude": ["src/tests"]
 }
