@@ -12,7 +12,68 @@ import authMiddleware from "../middlewares/auth_middleware.js";
 
 /**
  * @swagger
+ * /user/me:
+ *   get:
+ *     summary: Get the currently authenticated user
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Current user profile (password and refreshTokens excluded)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                 userId:
+ *                   type: string
+ *                 name:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 profileImage:
+ *                   type: string
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
+ */
+
+/**
+ * @swagger
  * /user/{id}:
+ *   get:
+ *     summary: Get user by ID
+ *     tags: [User]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: User found (password and refreshTokens excluded)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                 userId:
+ *                   type: string
+ *                 name:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 profileImage:
+ *                   type: string
+ *       404:
+ *         description: User not found
  *   put:
  *     summary: Update user by ID
  *     tags: [User]
@@ -31,15 +92,19 @@ import authMiddleware from "../middlewares/auth_middleware.js";
  *             properties:
  *               userId:
  *                 type: string
- *               email:
+ *               name:
  *                 type: string
  *               password:
+ *                 type: string
+ *               profileImage:
  *                 type: string
  *     responses:
  *       200:
  *         description: User updated
  *       404:
  *         description: User not found
+ *       500:
+ *         description: Internal server error
  *   delete:
  *     summary: Delete user by ID
  *     tags: [User]
@@ -51,7 +116,7 @@ import authMiddleware from "../middlewares/auth_middleware.js";
  *           type: string
  *     responses:
  *       200:
- *         description: User deleted
+ *         description: User deleted successfully
  *       404:
  *         description: User not found
  */

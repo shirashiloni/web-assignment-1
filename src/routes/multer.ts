@@ -4,6 +4,47 @@ import multer from "multer";
 import path from "path";
 import '../config.js';
 
+/**
+ * @swagger
+ * tags:
+ *   name: Upload
+ *   description: File upload endpoints
+ */
+
+/**
+ * @swagger
+ * /upload:
+ *   post:
+ *     summary: Upload a file
+ *     tags: [Upload]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - file
+ *             properties:
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *                 description: The file to upload
+ *     responses:
+ *       200:
+ *         description: File uploaded successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 url:
+ *                   type: string
+ *                   description: URL path to access the uploaded file
+ *       500:
+ *         description: Upload failed
+ */
+
 const router = express.Router();
 
 const base = "http://" + process.env.DOMAIN_BASE + ":" + process.env.PORT + "/";
