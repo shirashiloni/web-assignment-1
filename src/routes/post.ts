@@ -14,9 +14,33 @@ import PostController from "../controllers/post.js";
  *   get:
  *     summary: Get all posts
  *     tags: [Post]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Number of posts per page
  *     responses:
  *       200:
- *         description: List of posts
+ *         description: Paginated list of posts
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                 totalPages:
+ *                   type: integer
  *   post:
  *     summary: Create a new post
  *     tags: [Post]
@@ -24,16 +48,18 @@ import PostController from "../controllers/post.js";
  *       required: true
  *       content:
  *         application/json:
-	*           schema:
-	*             type: object
-	*             properties:
-	*               caption:
-	*                 type: string
-	*               createDate:
-	*                 type: string
-	*                 format: date-time
-	*               userId:
-	*                 type: string
+ *           schema:
+ *             type: object
+ *             required:
+ *               - caption
+ *               - userId
+ *             properties:
+ *               caption:
+ *                 type: string
+ *               userId:
+ *                 type: string
+ *               imageUrl:
+ *                 type: string
  *     responses:
  *       201:
  *         description: Post created
@@ -85,16 +111,15 @@ import PostController from "../controllers/post.js";
  *       required: true
  *       content:
  *         application/json:
-	*           schema:
-	*             type: object
-	*             properties:
-	*               caption:
-	*                 type: string
-	*               createDate:
-	*                 type: string
-	*                 format: date-time
-	*               userId:
-	*                 type: string
+ *           schema:
+ *             type: object
+ *             properties:
+ *               caption:
+ *                 type: string
+ *               userId:
+ *                 type: string
+ *               imageUrl:
+ *                 type: string
  *     responses:
  *       200:
  *         description: Post updated
@@ -154,6 +179,86 @@ import PostController from "../controllers/post.js";
  *         description: Missing search query
  *       500:
  *         description: Failed to search posts
+ */
+
+/**
+ * @swagger
+ * /post/{id}/like:
+ *   post:
+ *     summary: Like a post
+ *     tags: [Post]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Post ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - userId
+ *             properties:
+ *               userId:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Like recorded, returns updated likeCount
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 likeCount:
+ *                   type: integer
+ *       400:
+ *         description: Missing userId
+ *       404:
+ *         description: Post not found
+ */
+
+/**
+ * @swagger
+ * /post/{id}/unlike:
+ *   post:
+ *     summary: Unlike a post
+ *     tags: [Post]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Post ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - userId
+ *             properties:
+ *               userId:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Like removed, returns updated likeCount
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 likeCount:
+ *                   type: integer
+ *       400:
+ *         description: Missing userId
+ *       404:
+ *         description: Post not found
  */
 
 const router = express.Router();
